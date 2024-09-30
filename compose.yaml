@@ -1,0 +1,47 @@
+services:
+  server:
+    container_name: medsenger-scales-server
+    image: scales-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SOURCE_COMMIT: $SOURCE_COMMIT
+    ports:
+      - 9999:9990
+    volumes:
+      - ./:/src
+      - /src/tmp
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - localnet
+  db:
+    container_name: scales-bot-dev-db
+    image: postgres
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=medsenger
+      - POSTGRES_DB=scales-medsenger-bot
+      - POSTGRES_PASSWORD=blablabla
+    ports:
+      - 5432:5432
+      - 9990:9990
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-U", "medsenger", "-d", "scales-medsenger-bot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - localnet
+    hostname: db
+
+volumes:
+  db-data:
+
+networks:
+  localnet:
+    driver: bridge
