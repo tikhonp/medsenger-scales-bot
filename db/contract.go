@@ -55,3 +55,13 @@ func GetContractById(id int) (*Contract, error) {
 	return contract, err
 }
 
+// GetContractByAgentToken returns contract with specified agent token.
+func GetContractByAgentToken(agentToken string) (*Contract, error) {
+	contract := new(Contract)
+	err := db.Get(contract, `SELECT * FROM contracts WHERE agent_token = $1`, agentToken)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, echo.NewHTTPError(http.StatusNotFound, "Contract not found")
+	}
+	return contract, err
+}
+
