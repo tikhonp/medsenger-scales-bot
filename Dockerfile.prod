@@ -18,16 +18,23 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
     CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/server ./cmd/server
 
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,target=. \
+    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
+
 FROM alpine:${ALPINE_VERSION} AS final
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk --update add \
+        make \
         ca-certificates \
         tzdata \
         && \
         update-ca-certificates
 
 ADD --chmod=111 'https://github.com/apple/pkl/releases/download/0.26.3/pkl-alpine-linux-amd64' /bin/pkl
+
+ADD --chmod=111 'https://github.com/pressly/goose/releases/download/v3.22.1/goose_linux_x86_64' /bin/goose
 
 ARG UID=10001
 RUN adduser \
@@ -47,6 +54,7 @@ RUN echo $SOURCE_COMMIT > release.txt && chown tikhon release.txt && chmod 755 r
 USER tikhon
 
 COPY --from=build /bin/server /bin/
+COPY --from=build /bin/get_db_string /bin/
 
 # copy source code for sentry
 COPY . . 
