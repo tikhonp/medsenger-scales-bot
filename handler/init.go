@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/TikhonP/maigo"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/tikhonp/medsenger-scales-bot/db"
 )
@@ -36,8 +37,7 @@ func (h InitHandler) sendInitMessage(c db.Contract, ctx echo.Context) {
 		maigo.OnlyPatient(),
 	)
 	if err != nil {
-		// TODO: sentry
-		// sentry.CaptureException(err)
+		sentry.CaptureException(err)
 		ctx.Logger().Error(err)
 		return
 	}
@@ -46,16 +46,14 @@ func (h InitHandler) sendInitMessage(c db.Contract, ctx echo.Context) {
 func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 	ci, err := h.MaigoClient.GetContractInfo(c.Id)
 	if err != nil {
-		// TODO: sentry
-		// sentry.CaptureException(err)
+		sentry.CaptureException(err)
 		ctx.Logger().Error(err)
 		return
 	}
 	c.PatientName = sql.NullString{String: ci.PatientName, Valid: true}
 	c.PatientEmail = sql.NullString{String: ci.PatientEmail, Valid: true}
 	if err := c.Save(); err != nil {
-		// TODO: sentry
-		// sentry.CaptureException(err)
+		sentry.CaptureException(err)
 		ctx.Logger().Error(err)
 		return
 	}

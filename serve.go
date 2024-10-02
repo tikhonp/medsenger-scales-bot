@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/TikhonP/maigo"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tikhonp/medsenger-scales-bot/config"
@@ -24,9 +25,9 @@ type Server struct {
 func NewServer(cfg *config.Server) *Server {
 	maigoClient := maigo.Init(cfg.MedsengerAgentKey)
 	return &Server{
-		cfg:  cfg,
-		init: handler.InitHandler{MaigoClient: maigoClient},
-        newRecord: handler.NewRecordHandler{MaigoClient: maigoClient},
+		cfg:       cfg,
+		init:      handler.InitHandler{MaigoClient: maigoClient},
+		newRecord: handler.NewRecordHandler{MaigoClient: maigoClient},
 	}
 }
 
@@ -40,9 +41,8 @@ func (s *Server) Listen() {
 	}))
 	app.Use(middleware.Recover())
 	if !s.cfg.Debug {
-		// TODO: sentry
-		// app.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
-		// app.Logger.Printf("Sentry initialized")
+		app.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
+		app.Logger.Printf("Sentry initialized")
 	}
 	app.Validator = util.NewDefaultValidator()
 

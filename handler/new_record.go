@@ -2,10 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/TikhonP/maigo"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/tikhonp/medsenger-scales-bot/db"
 	"github.com/tikhonp/medsenger-scales-bot/util"
@@ -37,10 +37,9 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 	go func() {
 		_, err := h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time)})
 		if err != nil {
-			log.Println("Failed to send record to maigo:", err)
+			sentry.CaptureException(err)
+			c.Logger().Error(err)
 		}
-		// TODO: Send record to maigo
-		// so i need to implement it in maigo first :(
 	}()
 
 	return c.NoContent(http.StatusCreated)

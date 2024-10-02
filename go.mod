@@ -5,6 +5,7 @@ go 1.23.1
 require (
 	github.com/TikhonP/maigo v0.3.1
 	github.com/apple/pkl-go v0.8.0
+	github.com/getsentry/sentry-go v0.29.0
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v4 v4.12.0
