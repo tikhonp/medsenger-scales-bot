@@ -12,12 +12,13 @@ import (
 )
 
 type Server struct {
-	cfg      *config.Server
-	root     handler.RootHandler
-	init     handler.InitHandler
-	status   handler.StatusHandler
-	remove   handler.RemoveHandler
-	settings handler.SettingsHandler
+	cfg       *config.Server
+	root      handler.RootHandler
+	init      handler.InitHandler
+	status    handler.StatusHandler
+	remove    handler.RemoveHandler
+	settings  handler.SettingsHandler
+	newRecord handler.NewRecordHandler
 }
 
 func NewServer(cfg *config.Server) *Server {
@@ -25,6 +26,7 @@ func NewServer(cfg *config.Server) *Server {
 	return &Server{
 		cfg:  cfg,
 		init: handler.InitHandler{MaigoClient: maigoClient},
+        newRecord: handler.NewRecordHandler{MaigoClient: maigoClient},
 	}
 }
 
@@ -49,9 +51,9 @@ func (s *Server) Listen() {
 	app.POST("/status", s.status.Handle, util.ApiKeyJSON(s.cfg))
 	app.POST("/remove", s.remove.Handle, util.ApiKeyJSON(s.cfg))
 	app.GET("/settings", s.settings.Handle, util.ApiKeyGetParam(s.cfg))
+	app.POST("/new_record", s.newRecord.Handle)
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	app.Logger.Fatal(app.Start(addr))
-
 }
 

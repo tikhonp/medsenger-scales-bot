@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/TikhonP/maigo"
 	"github.com/labstack/echo/v4"
 	"github.com/tikhonp/medsenger-scales-bot/db"
+	"github.com/tikhonp/medsenger-scales-bot/util"
 )
 
 type newRecordModel struct {
-	AgentToken string    `json:"agent_token" validate:"required"`
-	Weight     int       `json:"weight" validate:"required"`
-	Time       time.Time `json:"time" validate:"required"`
+	AgentToken string         `json:"agent_token" validate:"required"`
+	Weight     int            `json:"weight" validate:"required"`
+	Time       util.Timestamp `json:"timestamp" validate:"required"`
 }
 
-type NewRecord struct {
+type NewRecordHandler struct {
 	MaigoClient *maigo.Client
 }
 
-func (h NewRecord) Handle(c echo.Context) error {
+func (h NewRecordHandler) Handle(c echo.Context) error {
 	m := new(newRecordModel)
 	if err := c.Bind(m); err != nil {
 		return err
@@ -33,8 +33,9 @@ func (h NewRecord) Handle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	go func() {
-		_, err := h.MaigoClient.AddRecord(contract.Id, "weight", fmt.Sprint(m.Weight), m.Time, nil)
+		_, err := h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time)})
 		if err != nil {
 			log.Println("Failed to send record to maigo:", err)
 		}

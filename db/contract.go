@@ -22,7 +22,7 @@ type Contract struct {
 func (c *Contract) Save() error {
 	const query = `
 		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email, locale)
-		VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id)
+		VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id)
 		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name, patient_email = EXCLUDED.patient_email, locale = EXCLUDED.locale
 	`
 	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail, c.Locale)
