@@ -20,6 +20,7 @@ type Server struct {
 	remove    handler.RemoveHandler
 	settings  handler.SettingsHandler
 	newRecord handler.NewRecordHandler
+	getApp    handler.GetAppHandler
 }
 
 func NewServer(cfg *config.Server) *Server {
@@ -53,6 +54,7 @@ func (s *Server) Listen() {
 	app.POST("/remove", s.remove.Handle, util.ApiKeyJSON(s.cfg))
 	app.GET("/settings", s.settings.Handle, util.ApiKeyGetParam(s.cfg))
 	app.POST("/new_record", s.newRecord.Handle)
+	app.GET("/app", s.getApp.Handle)
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	app.Logger.Fatal(app.Start(addr))

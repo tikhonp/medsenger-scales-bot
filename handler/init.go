@@ -27,7 +27,7 @@ type InitHandler struct {
 }
 
 func (h InitHandler) sendInitMessage(c db.Contract, ctx echo.Context) {
-	link := fmt.Sprintf("https://scales.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect", c.AgentToken.String, c.Id)
+	link := fmt.Sprintf("https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect", c.AgentToken.String, c.Id)
 	_, err := h.MaigoClient.SendMessage(
 		c.Id,
 		`Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут
