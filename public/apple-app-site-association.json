@@ -1,0 +1,14 @@
+{
+    "applinks": {
+        "details": [
+            {
+                "appIDs": [ "CRF22TKXX5.ru.medsenger.scales" ],
+                "components": [
+                    {
+                        "/": "*"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -46,6 +46,7 @@ func (s *Server) Listen() {
 	}
 	app.Validator = util.NewDefaultValidator()
 
+	app.File("/.well-known/apple-app-site-association", "public/apple-app-site-association.json")
 	app.GET("/", s.root.Handle)
 	app.POST("/init", s.init.Handle, util.ApiKeyJSON(s.cfg))
 	app.POST("/status", s.status.Handle, util.ApiKeyJSON(s.cfg))
