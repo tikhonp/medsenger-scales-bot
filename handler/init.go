@@ -28,7 +28,10 @@ type InitHandler struct {
 }
 
 func (h InitHandler) sendInitMessage(c db.Contract, ctx echo.Context) {
-	link := fmt.Sprintf("https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect", c.AgentToken.String, c.Id)
+	link := fmt.Sprintf(
+		"https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect&user_sex=%s&user_age=%d&user_height=%v",
+		c.AgentToken.String, c.Id, c.PatientSex.String, c.PatientAge.Int64, c.PatientHeight.Float64,
+	)
 	_, err := h.MaigoClient.SendMessage(
 		c.Id,
 		`Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут
@@ -52,39 +55,39 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 		return
 	}
 	age, err := strconv.ParseInt(ci.PatientAge, 10, 64)
-    if err != nil {
-        sentry.CaptureException(err)
-        ctx.Logger().Error(err)
-        return
-    }
-    records, err := h.MaigoClient.GetRecords(c.Id, maigo.WithCategoryName("height"), maigo.Limit(1))
-    if err != nil {
-        sentry.CaptureException(err)
-        ctx.Logger().Error(err)
-        return
-    }
-    if len(records) == 0 {
-        _, err := h.MaigoClient.SendMessage(
-            c.Id,
-            "Пожалуйста, введите свой рост в приложении, чтобы мы могли рассчитать ваш индекс массы тела.",
-        )
-        if err != nil {
-            sentry.CaptureException(err)
-            ctx.Logger().Error(err)
-        }
-        return
-    }
-    height, ok := records[0].Value.(float64)
-    if !ok {
-        sentry.CaptureException(err)
-        ctx.Logger().Error(err)
-        return
-    }
+	if err != nil {
+		sentry.CaptureException(err)
+		ctx.Logger().Error(err)
+		return
+	}
+	records, err := h.MaigoClient.GetRecords(c.Id, maigo.WithCategoryName("height"), maigo.Limit(1))
+	if err != nil {
+		sentry.CaptureException(err)
+		ctx.Logger().Error(err)
+		return
+	}
+	if len(records) == 0 {
+		_, err := h.MaigoClient.SendMessage(
+			c.Id,
+			"Пожалуйста, введите свой рост в приложении, чтобы мы могли рассчитать ваш индекс массы тела.",
+		)
+		if err != nil {
+			sentry.CaptureException(err)
+			ctx.Logger().Error(err)
+		}
+		return
+	}
+	height, ok := records[0].Value.(float64)
+	if !ok {
+		sentry.CaptureException(err)
+		ctx.Logger().Error(err)
+		return
+	}
 	c.PatientName = sql.NullString{String: ci.PatientName, Valid: true}
 	c.PatientEmail = sql.NullString{String: ci.PatientEmail, Valid: true}
 	c.PatientSex = sql.NullString{String: string(ci.PatientSex), Valid: true}
 	c.PatientAge = sql.NullInt64{Int64: age, Valid: true}
-    c.PatientHeight = sql.NullFloat64{Float64: height, Valid: true}
+	c.PatientHeight = sql.NullFloat64{Float64: height, Valid: true}
 	if err := c.Save(); err != nil {
 		sentry.CaptureException(err)
 		ctx.Logger().Error(err)
