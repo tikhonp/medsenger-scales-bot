@@ -15,6 +15,7 @@ type newRecordModel struct {
 	AgentToken string         `json:"agent_token" validate:"required"`
 	Weight     int            `json:"weight" validate:"required"`
 	Time       util.Timestamp `json:"timestamp" validate:"required"`
+	OtherData  string         `json:"other_data" validate:"required"`
 }
 
 type NewRecordHandler struct {
@@ -36,6 +37,11 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 
 	go func() {
 		_, err := h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time)})
+		if err != nil {
+			sentry.CaptureException(err)
+			c.Logger().Error(err)
+		}
+		_, err = h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("information", m.OtherData, m.Time.Time)})
 		if err != nil {
 			sentry.CaptureException(err)
 			c.Logger().Error(err)
