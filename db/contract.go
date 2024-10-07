@@ -10,22 +10,25 @@ import (
 // Contract represents Medsenger contract.
 // Create on agent /init and persist during agent lifecycle.
 type Contract struct {
-	Id           int            `db:"id"`
-	IsActive     bool           `db:"is_active"`
-	AgentToken   sql.NullString `db:"agent_token"`
-	PatientName  sql.NullString `db:"patient_name"`
-	PatientEmail sql.NullString `db:"patient_email"`
-	Locale       sql.NullString `db:"locale"`
+	Id            int             `db:"id"`
+	IsActive      bool            `db:"is_active"`
+	AgentToken    sql.NullString  `db:"agent_token"`
+	PatientName   sql.NullString  `db:"patient_name"`
+	PatientEmail  sql.NullString  `db:"patient_email"`
+	Locale        sql.NullString  `db:"locale"`
+	PatientSex    sql.NullString  `db:"patient_sex"`
+	PatientAge    sql.NullInt64   `db:"patient_age"`
+	PatientHeight sql.NullFloat64 `db:"patient_height"`
 }
 
 // Save on Contract saves structure to database.
 func (c *Contract) Save() error {
 	const query = `
-		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email, locale)
-		VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id)
-		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name, patient_email = EXCLUDED.patient_email, locale = EXCLUDED.locale
+		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email, locale, patient_sex, patient_age, patient_height)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id)
+		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name, patient_email = EXCLUDED.patient_email, locale = EXCLUDED.locale, patient_sex = EXCLUDED.patient_sex, patient_age = EXCLUDED.patient_age, patient_height = EXCLUDED.patient_height
 	`
-	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail, c.Locale)
+	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail, c.Locale, c.PatientSex, c.PatientAge, c.PatientHeight)
 	return err
 }
 

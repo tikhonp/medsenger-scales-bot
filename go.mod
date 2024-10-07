@@ -3,7 +3,7 @@ module github.com/tikhonp/medsenger-scales-bot
 go 1.23.1
 
 require (
-	github.com/TikhonP/maigo v0.3.1
+	github.com/TikhonP/maigo v0.4.0
 	github.com/apple/pkl-go v0.8.0
 	github.com/getsentry/sentry-go v0.29.0
 	github.com/go-playground/validator/v10 v10.22.1
@@ -31,3 +31,4 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 )
+

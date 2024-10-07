@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/TikhonP/maigo"
 	"github.com/getsentry/sentry-go"
@@ -50,8 +51,40 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 		ctx.Logger().Error(err)
 		return
 	}
+	age, err := strconv.ParseInt(ci.PatientAge, 10, 64)
+    if err != nil {
+        sentry.CaptureException(err)
+        ctx.Logger().Error(err)
+        return
+    }
+    records, err := h.MaigoClient.GetRecords(c.Id, maigo.WithCategoryName("height"), maigo.Limit(1))
+    if err != nil {
+        sentry.CaptureException(err)
+        ctx.Logger().Error(err)
+        return
+    }
+    if len(records) == 0 {
+        _, err := h.MaigoClient.SendMessage(
+            c.Id,
+            "Пожалуйста, введите свой рост в приложении, чтобы мы могли рассчитать ваш индекс массы тела.",
+        )
+        if err != nil {
+            sentry.CaptureException(err)
+            ctx.Logger().Error(err)
+        }
+        return
+    }
+    height, ok := records[0].Value.(float64)
+    if !ok {
+        sentry.CaptureException(err)
+        ctx.Logger().Error(err)
+        return
+    }
 	c.PatientName = sql.NullString{String: ci.PatientName, Valid: true}
 	c.PatientEmail = sql.NullString{String: ci.PatientEmail, Valid: true}
+	c.PatientSex = sql.NullString{String: string(ci.PatientSex), Valid: true}
+	c.PatientAge = sql.NullInt64{Int64: age, Valid: true}
+    c.PatientHeight = sql.NullFloat64{Float64: height, Valid: true}
 	if err := c.Save(); err != nil {
 		sentry.CaptureException(err)
 		ctx.Logger().Error(err)
