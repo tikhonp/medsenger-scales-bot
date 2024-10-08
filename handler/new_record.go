@@ -14,7 +14,7 @@ import (
 type newRecordModel struct {
 	AgentToken        string         `json:"agent_token" validate:"required"`
 	Time              util.Timestamp `json:"timestamp" validate:"required"`
-	Weight            *float64       `json:"weight" validate:"required"`
+	Weight            float64        `json:"weight" validate:"required"`
 	BodyFatPercentage *float64       `json:"body_fat_percentage,omitempty"`
 	BoneMass          *float64       `json:"bone_mass,omitempty"`
 	MuscleMass        *float64       `json:"muscle_mass,omitempty"`
@@ -43,20 +43,20 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 		records := []maigo.Record{
 			maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time),
 		}
-		if m.BodyFatPercentage == nil {
-			records = append(records, maigo.NewRecord("body_fat_percentage", fmt.Sprint(m.BodyFatPercentage), m.Time.Time))
+		if m.BodyFatPercentage != nil {
+			records = append(records, maigo.NewRecord("body_fat_percentage", fmt.Sprint(*m.BodyFatPercentage), m.Time.Time))
 		}
-		if m.BoneMass == nil {
-			records = append(records, maigo.NewRecord("bone_mass", fmt.Sprint(m.BoneMass), m.Time.Time))
+		if m.BoneMass != nil {
+			records = append(records, maigo.NewRecord("bone_mass", fmt.Sprint(*m.BoneMass), m.Time.Time))
 		}
-		if m.MuscleMass == nil {
-			records = append(records, maigo.NewRecord("muscle_mass", fmt.Sprint(m.MuscleMass), m.Time.Time))
+		if m.MuscleMass != nil {
+			records = append(records, maigo.NewRecord("muscle_mass", fmt.Sprint(*m.MuscleMass), m.Time.Time))
 		}
-		if m.WaterPercentage == nil {
-			records = append(records, maigo.NewRecord("water_percentage", fmt.Sprint(m.WaterPercentage), m.Time.Time))
+		if m.WaterPercentage != nil {
+			records = append(records, maigo.NewRecord("water_percentage", fmt.Sprint(*m.WaterPercentage), m.Time.Time))
 		}
-		if m.VisceralFat == nil {
-			records = append(records, maigo.NewRecord("visceral_fat", fmt.Sprint(m.VisceralFat), m.Time.Time))
+		if m.VisceralFat != nil {
+			records = append(records, maigo.NewRecord("visceral_fat", fmt.Sprint(*m.VisceralFat), m.Time.Time))
 		}
 		_, err := h.MaigoClient.AddRecords(contract.Id, records)
 		if err != nil {
