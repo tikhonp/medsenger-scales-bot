@@ -50,6 +50,7 @@ func (s *Server) Listen() {
 	app.Validator = util.NewDefaultValidator()
 
 	app.File("/.well-known/apple-app-site-association", "public/apple-app-site-association.json")
+	app.File("/.well-known/assetlinks.json", "public/assetlinks.json")
 	app.Static("/static", "public/static")
 	app.GET("/", s.root.Handle)
 	app.POST("/init", s.init.Handle, util.ApiKeyJSON(s.cfg))
