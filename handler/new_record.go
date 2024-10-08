@@ -12,10 +12,14 @@ import (
 )
 
 type newRecordModel struct {
-	AgentToken string         `json:"agent_token" validate:"required"`
-	Weight     int            `json:"weight" validate:"required"`
-	Time       util.Timestamp `json:"timestamp" validate:"required"`
-	OtherData  string         `json:"other_data" validate:"required"`
+	AgentToken        string         `json:"agent_token" validate:"required"`
+	Time              util.Timestamp `json:"timestamp" validate:"required"`
+	Weight            float64        `json:"weight" validate:"required"`
+	BodyFatPercentage float64        `json:"body_fat_percentage" validate:"required"`
+	BoneMass          float64        `json:"bone_mass" validate:"required"`
+	MuscleMass        float64        `json:"muscle_mass" validate:"required"`
+	WaterPercentage   float64        `json:"water_percentage" validate:"required"`
+	VisceralFat       int            `json:"visceral_fat" validate:"required"`
 }
 
 type NewRecordHandler struct {
@@ -36,12 +40,17 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 	}
 
 	go func() {
-		_, err := h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time)})
-		if err != nil {
-			sentry.CaptureException(err)
-			c.Logger().Error(err)
-		}
-		_, err = h.MaigoClient.AddRecords(contract.Id, []maigo.Record{maigo.NewRecord("information", m.OtherData, m.Time.Time)})
+		_, err := h.MaigoClient.AddRecords(
+			contract.Id,
+			[]maigo.Record{
+				maigo.NewRecord("weight", fmt.Sprint(m.Weight), m.Time.Time),
+				maigo.NewRecord("body_fat_percentage", fmt.Sprint(m.BodyFatPercentage), m.Time.Time),
+				maigo.NewRecord("bone_mass", fmt.Sprint(m.BoneMass), m.Time.Time),
+				maigo.NewRecord("muscle_mass", fmt.Sprint(m.MuscleMass), m.Time.Time),
+				maigo.NewRecord("water_percentage", fmt.Sprint(m.WaterPercentage), m.Time.Time),
+				maigo.NewRecord("visceral_fat", fmt.Sprint(m.VisceralFat), m.Time.Time),
+			},
+		)
 		if err != nil {
 			sentry.CaptureException(err)
 			c.Logger().Error(err)
