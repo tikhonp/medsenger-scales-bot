@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -27,26 +26,6 @@ type InitHandler struct {
 	MaigoClient *maigo.Client
 }
 
-func (h InitHandler) sendInitMessage(c db.Contract, ctx echo.Context) {
-	link := fmt.Sprintf(
-		"https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect&user_sex=%s&user_age=%d&user_height=%v",
-		c.AgentToken.String, c.Id, c.PatientSex.String, c.PatientAge.Int64, c.PatientHeight.Float64,
-	)
-	_, err := h.MaigoClient.SendMessage(
-		c.Id,
-		`Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут
-        автоматически поступать врачу. Для этого Вам нужно скачать приложение 
-        <strong>Medsenger SCALES</strong>, а затем нажать на кнопку "Подключить устройство" ниже.`,
-		maigo.WithAction("Подключить устройство", link, maigo.AppUrl),
-		maigo.OnlyPatient(),
-	)
-	if err != nil {
-		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
-		return
-	}
-}
-
 func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 	ci, err := h.MaigoClient.GetContractInfo(c.Id)
 	if err != nil {
@@ -69,7 +48,9 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 	if len(records) == 0 {
 		_, err := h.MaigoClient.SendMessage(
 			c.Id,
-			"Пожалуйста, введите свой рост в приложении, чтобы мы могли рассчитать ваш индекс массы тела.",
+			"Пожалуйста, введите свой рост, чтобы мы могли рассчитать ваш индекс массы тела.",
+			maigo.WithAction("Заполнить", "/get_height", maigo.Action),
+			maigo.OnlyPatient(),
 		)
 		if err != nil {
 			sentry.CaptureException(err)
@@ -93,7 +74,7 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 		ctx.Logger().Error(err)
 		return
 	}
-	h.sendInitMessage(c, ctx)
+	sendInitMessage(c, h.MaigoClient, ctx)
 	ctx.Logger().Info("Successfully fetched contract data")
 }
 

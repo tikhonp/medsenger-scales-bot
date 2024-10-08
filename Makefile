@@ -14,3 +14,6 @@ up:
 
 reset:
 	@goose postgres "$(shell /bin/get_db_string)" -dir=migrations reset
+
+templ:
+	@templ generate

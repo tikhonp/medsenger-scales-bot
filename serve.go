@@ -21,6 +21,7 @@ type Server struct {
 	settings  handler.SettingsHandler
 	newRecord handler.NewRecordHandler
 	getApp    handler.GetAppHandler
+	getHeight handler.GetHeightHandler
 }
 
 func NewServer(cfg *config.Server) *Server {
@@ -29,6 +30,7 @@ func NewServer(cfg *config.Server) *Server {
 		cfg:       cfg,
 		init:      handler.InitHandler{MaigoClient: maigoClient},
 		newRecord: handler.NewRecordHandler{MaigoClient: maigoClient},
+		getHeight: handler.GetHeightHandler{MaigoClient: maigoClient},
 	}
 }
 
@@ -48,6 +50,7 @@ func (s *Server) Listen() {
 	app.Validator = util.NewDefaultValidator()
 
 	app.File("/.well-known/apple-app-site-association", "public/apple-app-site-association.json")
+	app.Static("/static", "public/static")
 	app.GET("/", s.root.Handle)
 	app.POST("/init", s.init.Handle, util.ApiKeyJSON(s.cfg))
 	app.POST("/status", s.status.Handle, util.ApiKeyJSON(s.cfg))
@@ -55,6 +58,9 @@ func (s *Server) Listen() {
 	app.GET("/settings", s.settings.Handle, util.ApiKeyGetParam(s.cfg))
 	app.POST("/new_record", s.newRecord.Handle)
 	app.GET("/app", s.getApp.Handle)
+
+	app.GET("/get_height", s.getHeight.Get, util.ApiKeyGetParam(s.cfg))
+	app.POST("/get_height", s.getHeight.Post, util.ApiKeyGetParam(s.cfg))
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	app.Logger.Fatal(app.Start(addr))

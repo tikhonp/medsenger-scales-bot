@@ -8,6 +8,7 @@ WORKDIR /src
 
 RUN go install "github.com/air-verse/air@latest"
 RUN go install "github.com/pressly/goose/v3/cmd/goose@latest"
+RUN go install "github.com/a-h/templ/cmd/templ@latest"
 
 ADD --chmod=111 'https://github.com/apple/pkl/releases/download/0.26.3/pkl-alpine-linux-amd64' /bin/pkl
 
