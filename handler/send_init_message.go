@@ -16,9 +16,9 @@ func sendInitMessage(c db.Contract, maigoClient *maigo.Client, ctx echo.Context)
 	)
 	_, err := maigoClient.SendMessage(
 		c.Id,
-		`Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут
-        автоматически поступать врачу. Для этого Вам нужно скачать приложение 
-        <strong>Medsenger SCALES</strong>, а затем нажать на кнопку "Подключить устройство" ниже.`,
+		"Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут "+
+			"автоматически поступать врачу. Для этого Вам нужно скачать приложение "+
+			"<strong>Medsenger Scales</strong>, а затем нажать на кнопку \"Подключить устройство\" ниже.",
 		maigo.WithAction("Подключить устройство", link, maigo.AppUrl),
 		maigo.OnlyPatient(),
 	)

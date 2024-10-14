@@ -48,7 +48,7 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 	if len(records) == 0 {
 		_, err := h.MaigoClient.SendMessage(
 			c.Id,
-			"Пожалуйста, введите свой рост, чтобы мы могли рассчитать ваш индекс массы тела.",
+			"Пожалуйста, введите свой рост, чтобы мы могли рассчитать индекс массы Вашего тела.",
 			maigo.WithAction("Заполнить", "/get_height", maigo.Action),
 			maigo.OnlyPatient(),
 		)
