@@ -45,7 +45,46 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 		ctx.Logger().Error(err)
 		return
 	}
+	var height float64
 	if len(records) == 0 {
+		castedHeight, ok := records[0].Value.(float64)
+        if ok {
+            height = castedHeight
+        }
+	}
+	if ci.PatientSex == "" {
+		c.PatientName = sql.NullString{Valid: false}
+	} else {
+		c.PatientName = sql.NullString{String: ci.PatientName, Valid: true}
+	}
+	if ci.PatientEmail == "" {
+		c.PatientEmail = sql.NullString{Valid: false}
+	} else {
+		c.PatientEmail = sql.NullString{String: ci.PatientEmail, Valid: true}
+	}
+	if ci.PatientSex == "" {
+		c.PatientSex = sql.NullString{Valid: false}
+	} else {
+		c.PatientSex = sql.NullString{String: string(ci.PatientSex), Valid: true}
+	}
+	if ci.PatientAge == "" {
+		c.PatientAge = sql.NullInt64{Valid: false}
+	} else {
+		c.PatientAge = sql.NullInt64{Int64: age, Valid: true}
+	}
+	if height == 0 {
+		c.PatientHeight = sql.NullFloat64{Valid: false}
+	} else {
+		c.PatientHeight = sql.NullFloat64{Float64: height, Valid: true}
+	}
+	if err := c.Save(); err != nil {
+		sentry.CaptureException(err)
+		ctx.Logger().Error(err)
+		return
+	}
+	if c.PatientHeight.Valid {
+		sendInitMessage(c, h.MaigoClient, ctx)
+	} else {
 		_, err := h.MaigoClient.SendMessage(
 			c.Id,
 			"Пожалуйста, введите свой рост, чтобы мы могли рассчитать индекс массы Вашего тела.",
@@ -56,26 +95,7 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 			sentry.CaptureException(err)
 			ctx.Logger().Error(err)
 		}
-		return
 	}
-	height, ok := records[0].Value.(float64)
-	if !ok {
-		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
-		return
-	}
-	c.PatientName = sql.NullString{String: ci.PatientName, Valid: true}
-	c.PatientEmail = sql.NullString{String: ci.PatientEmail, Valid: true}
-	c.PatientSex = sql.NullString{String: string(ci.PatientSex), Valid: true}
-	c.PatientAge = sql.NullInt64{Int64: age, Valid: true}
-	c.PatientHeight = sql.NullFloat64{Float64: height, Valid: true}
-	if err := c.Save(); err != nil {
-		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
-		return
-	}
-	sendInitMessage(c, h.MaigoClient, ctx)
-	ctx.Logger().Info("Successfully fetched contract data")
 }
 
 func (h InitHandler) Handle(c echo.Context) error {
