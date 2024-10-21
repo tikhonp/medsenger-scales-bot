@@ -1,9 +1,11 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "ru.medsenger.scales",
-    "sha256_cert_fingerprints":
-    ["80:2A:6A:B1:F1:9F:64:1B:9C:8E:A3:7F:91:2D:16:1A:AC:96:BD:89:F5:C5:96:77:9B:9E:E3:31:3E:E0:59:13"]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ru.medsenger.scales",
+      "sha256_cert_fingerprints":
+        ["A6:D9:59:2B:52:14:61:73:41:1A:D8:0B:60:6A:D5:B2:89:A6:1B:7A:E2:F6:51:3D:5A:00:B7:CF:46:C5:E6:58"]
+    }
   }
-}]
+]
