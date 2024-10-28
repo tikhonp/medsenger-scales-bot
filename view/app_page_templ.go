@@ -73,10 +73,6 @@ func AppPage() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <p class=\"card-text mt-4\">Приложения для Android будут доступны позже.</p>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
 				return templ_7745c5c3_Err
 			})
 			templ_7745c5c3_Err = appPageLayout().Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
@@ -122,7 +118,7 @@ func appPageLayout() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container p-3\"><div class=\"card\"><div class=\"card-body p-4\"><h2 class=\"card-title mb-3\">Скачайте приложение Medsenger Scales</h2><p class=\"card-subtitle mb-3 text-body-secondary\">Чтобы измерить давление или сделать ЭКГ и отправить результат врачу, Вам понадобится мобильное приложение Medsenger АКСМА.</p><p class=\"card-text mb-4\">Скачайте его из магазина по ссылке ниже, а затем снова нажмите на кнопку \"Привязать тонометр\" в Medsenger.</p>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container p-3\"><div class=\"card\"><div class=\"card-body p-4\"><h2 class=\"card-title mb-3\">Скачайте приложение Medsenger Scales</h2><p class=\"card-subtitle mb-3 text-body-secondary\">Чтобы измерить давление или сделать ЭКГ и отправить результат врачу, Вам понадобится мобильное приложение Medsenger АКСМА.</p><p class=\"card-text mb-4\">Скачайте его из магазина по ссылке ниже, а затем снова нажмите на кнопку \"Подключить устройство\" в Medsenger.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
