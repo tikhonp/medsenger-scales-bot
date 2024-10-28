@@ -57,7 +57,23 @@ func AppPage() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("   <p class=\"card-text mt-4\">Приложения для Android будут доступны позже.</p>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = googlePlayAppButton().Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = downloadApkButton().Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <p class=\"card-text mt-4\">Приложения для Android будут доступны позже.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -143,7 +159,7 @@ func downloadApkButton() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://storage.medsenger.ru/apps/ru.medsenger.acsma.apk\" class=\"storeLink me-2\"><img alt=\"Скачать apk\" src=\"/static/apk.png\" style=\"--width: 110%;\"></a>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://storage.medsenger.ru/apps/ru.medsenger.scales.apk\" class=\"storeLink me-2\"><img alt=\"Скачать apk\" src=\"/static/apk.png\" width=\"119.66407\"></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -201,7 +217,7 @@ func googlePlayAppButton() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://play.google.com/store/apps/details?id=ru.medsenger.acsma&amp;hl=ru_RU \" class=\"storeLink me-2\"><img alt=\"Доступно в Google Play\" src=\"/static/android.png\" style=\"--width: 110%;\"></a>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://play.google.com/store/apps/details?id=ru.medsenger.scales\" class=\"storeLink me-2\"><img alt=\"Доступно в Google Play\" src=\"/static/android.png\" width=\"119.66407\"></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

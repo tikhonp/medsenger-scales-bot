@@ -4,8 +4,8 @@ templ AppPage() {
 	@Base("Подключение умных весов.") {
 		@appPageLayout() {
 			@iosAppButton()
-			// @googlePlayAppButton()
-			// @downloadApkButton()
+			@googlePlayAppButton()
+			@downloadApkButton()
 			<p class="card-text mt-4">Приложения для Android будут доступны позже.</p>
 		}
 		@footer()
@@ -35,8 +35,8 @@ templ appPageLayout() {
 }
 
 templ downloadApkButton() {
-	<a href="https://storage.medsenger.ru/apps/ru.medsenger.acsma.apk" class="storeLink me-2">
-		<img alt="Скачать apk" src="/static/apk.png" style="--width: 110%;"/>
+	<a href="https://storage.medsenger.ru/apps/ru.medsenger.scales.apk" class="storeLink me-2">
+		<img alt="Скачать apk" src="/static/apk.png" width="119.66407"/>
 	</a>
 }
 
@@ -49,10 +49,10 @@ templ iosAppButton() {
 
 templ googlePlayAppButton() {
 	<a
-		href="https://play.google.com/store/apps/details?id=ru.medsenger.acsma&hl=ru_RU "
+		href="https://play.google.com/store/apps/details?id=ru.medsenger.scales"
 		class="storeLink me-2"
 	>
-		<img alt="Доступно в Google Play" src="/static/android.png" style="--width: 110%;"/>
+		<img alt="Доступно в Google Play" src="/static/android.png" width="119.66407"/>
 	</a>
 }
 
