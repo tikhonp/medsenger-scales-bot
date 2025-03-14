@@ -1,6 +1,6 @@
 services:
   server:
-    container_name: medsenger-scales-server
+    container_name: agents-scales-server
     image: scales-bot
     build:
       context: .

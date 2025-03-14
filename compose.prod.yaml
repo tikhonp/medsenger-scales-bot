@@ -1,6 +1,6 @@
 services:
   server:
-    container_name: agents-scales
+    container_name: agents-scales-server
     image: scales-bot
     build:
       context: .
