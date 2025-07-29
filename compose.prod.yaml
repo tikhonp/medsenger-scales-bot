@@ -1,19 +1,20 @@
 services:
   server:
     container_name: agents-scales-server
-    image: scales-bot
+    image: docker.telepat.online/agents-scales-image:latest
+    restart: unless-stopped
     build:
       context: .
-      dockerfile: Dockerfile.prod
-      target: final
-      network: "host"
-      args:
-        SOURCE_COMMIT: $SOURCE_COMMIT
+      target: prod
     command: server
-    restart: unless-stopped
     network_mode: "host"
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    env_file:
+      - .env
+    environment:
+      - SOURCE_COMMIT=${SOURCE_COMMIT}
+      - DEBUG=false

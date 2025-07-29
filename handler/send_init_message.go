@@ -12,10 +12,10 @@ import (
 func sendInitMessage(c db.Contract, maigoClient *maigo.Client, ctx echo.Context) {
 	link := fmt.Sprintf(
 		"https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect&user_sex=%s&user_age=%d&user_height=%v",
-		c.AgentToken.String, c.Id, c.PatientSex.String, c.PatientAge.Int64, c.PatientHeight.Float64,
+		c.AgentToken.String, c.ID, c.PatientSex.String, c.PatientAge.Int64, c.PatientHeight.Float64,
 	)
 	_, err := maigoClient.SendMessage(
-		c.Id,
+		c.ID,
 		"Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут "+
 			"автоматически поступать врачу. Для этого Вам нужно скачать приложение "+
 			"<strong>Medsenger Scales</strong>, а затем нажать на кнопку \"Подключить устройство\" ниже.",

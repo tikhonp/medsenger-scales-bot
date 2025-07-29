@@ -23,3 +23,5 @@ pkl/local/
 node_modules/
 test.rest
 pkl_cache/
+
+.env

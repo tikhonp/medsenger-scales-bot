@@ -1,3 +1,4 @@
+// Package handler provides HTTP handlers for Medsenger Scales Bot. 
 package handler
 
 import (

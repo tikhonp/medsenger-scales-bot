@@ -1,3 +1,4 @@
+// Package medsengerscalesbot provides the main server for the Medsenger Scales Bot.
 package medsengerscalesbot
 
 import (
@@ -7,13 +8,12 @@ import (
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/tikhonp/medsenger-scales-bot/config"
 	"github.com/tikhonp/medsenger-scales-bot/handler"
 	"github.com/tikhonp/medsenger-scales-bot/util"
 )
 
 type Server struct {
-	cfg       *config.Server
+	cfg       *util.Server
 	root      handler.RootHandler
 	init      handler.InitHandler
 	status    handler.StatusHandler
@@ -24,7 +24,7 @@ type Server struct {
 	getHeight handler.GetHeightHandler
 }
 
-func NewServer(cfg *config.Server) *Server {
+func NewServer(cfg *util.Server) *Server {
 	maigoClient := maigo.Init(cfg.MedsengerAgentKey)
 	return &Server{
 		cfg:       cfg,
@@ -53,17 +53,16 @@ func (s *Server) Listen() {
 	app.File("/.well-known/assetlinks.json", "public/assetlinks.json")
 	app.Static("/static", "public/static")
 	app.GET("/", s.root.Handle)
-	app.POST("/init", s.init.Handle, util.ApiKeyJSON(s.cfg))
-	app.POST("/status", s.status.Handle, util.ApiKeyJSON(s.cfg))
-	app.POST("/remove", s.remove.Handle, util.ApiKeyJSON(s.cfg))
-	app.GET("/settings", s.settings.Handle, util.ApiKeyGetParam(s.cfg))
+	app.POST("/init", s.init.Handle, util.APIKeyJSON(s.cfg))
+	app.POST("/status", s.status.Handle, util.APIKeyJSON(s.cfg))
+	app.POST("/remove", s.remove.Handle, util.APIKeyJSON(s.cfg))
+	app.GET("/settings", s.settings.Handle, util.APIKeyGetParam(s.cfg))
 	app.POST("/new_record", s.newRecord.Handle)
 	app.GET("/app", s.getApp.Handle)
 
-	app.GET("/get_height", s.getHeight.Get, util.ApiKeyGetParam(s.cfg))
-	app.POST("/get_height", s.getHeight.Post, util.ApiKeyGetParam(s.cfg))
+	app.GET("/get_height", s.getHeight.Get, util.APIKeyGetParam(s.cfg))
+	app.POST("/get_height", s.getHeight.Post, util.APIKeyGetParam(s.cfg))
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	app.Logger.Fatal(app.Start(addr))
 }
-

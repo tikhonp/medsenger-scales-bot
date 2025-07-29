@@ -34,11 +34,11 @@ func (h GetHeightHandler) Post(c echo.Context) error {
 	if err := c.Validate(fd); err != nil {
 		return err
 	}
-	contractId := util.QueryParamInt(c, "contract_id")
-	if contractId == nil {
+	contractID := util.QueryParamInt(c, "contract_id")
+	if contractID == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "contract_id is required")
 	}
-	contract, err := db.GetContractById(*contractId)
+	contract, err := db.GetContractByID(*contractID)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (h GetHeightHandler) Post(c echo.Context) error {
 	}
 	go func() {
         sendInitMessage(*contract, h.MaigoClient, c)
-		_, err := h.MaigoClient.AddRecords(*contractId, []maigo.Record{maigo.NewRecord("height", strconv.Itoa(fd.Height), time.Now())})
+		_, err := h.MaigoClient.AddRecords(*contractID, []maigo.Record{maigo.NewRecord("height", strconv.Itoa(fd.Height), time.Now())})
 		if err != nil {
 			sentry.CaptureException(err)
 			c.Logger().Error(err)

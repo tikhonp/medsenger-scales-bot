@@ -1,26 +1,24 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION=1.24.1
+ARG GOVERSION=1.24.5
 
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS build
-
+FROM golang:${GOVERSION}-alpine AS dev
+RUN go install "github.com/air-verse/air@latest" && \
+    go install "github.com/a-h/templ/cmd/templ@latest" &&\
+    go install "github.com/pressly/goose/v3/cmd/goose@latest"
 WORKDIR /src
-
-RUN go install "github.com/air-verse/air@latest"
-RUN go install "github.com/pressly/goose/v3/cmd/goose@latest"
-RUN go install "github.com/a-h/templ/cmd/templ@latest"
-
-ADD --chmod=111 'https://github.com/apple/pkl/releases/download/0.26.3/pkl-alpine-linux-amd64' /bin/pkl
-
 COPY go.mod go.sum ./
-
 RUN go mod download && go mod verify
+CMD ["air", "-c", ".air.toml"]
 
-COPY . ./
-
+FROM golang:${GOVERSION}-alpine AS prod
+RUN go install "github.com/pressly/goose/v3/cmd/goose@latest"
 ARG TARGETARCH
+WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
-
-CMD ["air"]
+    GOARCH=$TARGETARCH go build -o /bin/server ./cmd/server
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,target=. \
+    GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
+COPY . .

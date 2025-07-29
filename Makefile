@@ -1,34 +1,41 @@
+SOURCE_COMMIT_SHA := $(shell git rev-parse HEAD)
+
+ENVS := SOURCE_COMMIT=${SOURCE_COMMIT_SHA} COMPOSE_BAKE=true
+
+
+.PHONY: run dev build-dev prod fprod logs-prod go-to-server-container templ db-status db-up db-reset
+
 run: dev
 
-dev: export SOURCE_COMMIT=$(shell git rev-parse HEAD)
 dev:
-	docker compose -f compose.yaml up
+	${ENVS} docker compose -f compose.yaml up
 
-build-dev: export SOURCE_COMMIT=$(shell git rev-parse HEAD)
 build-dev:
-	docker compose -f compose.yaml up --build
+	${ENVS} docker compose -f compose.yaml up --build
 
-prod: export SOURCE_COMMIT=$(shell git rev-parse HEAD)
+fdev:
+	${ENVS} docker compose -f compose.yaml down
+
 prod:
-	docker compose -f compose.prod.yaml up --build -d
+	${ENVS} docker compose -f compose.prod.yaml up --build -d
 
 fprod:
-	docker compose -f compose.prod.yaml down
+	${ENVS} docker compose -f compose.prod.yaml down
 
 logs-prod:
-	docker compose -f compose.prod.yaml logs -f -n 100
+	${ENVS} docker compose -f compose.prod.yaml logs -f -n 100
 
 go-to-server-container:
-	docker exec -it agents-scales-server /bin/bash
+	docker exec -it --tty agents-scales-server /bin/sh
 
 db-status:
-	@goose postgres "$(shell /bin/get_db_string)" -dir=migrations status
+	goose postgres "$(shell /bin/get_db_string)" -dir=migrations status
 
 db-up:
-	@goose postgres "$(shell /bin/get_db_string)" -dir=migrations up
+	goose postgres "$(shell /bin/get_db_string)" -dir=migrations up
 
 db-reset:
-	@goose postgres "$(shell /bin/get_db_string)" -dir=migrations reset
+	goose postgres "$(shell /bin/get_db_string)" -dir=migrations reset
 
 templ:
-	@templ generate
+	docker exec -it --tty agents-scales-server templ generate

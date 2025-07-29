@@ -58,7 +58,7 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 		if m.VisceralFat != nil {
 			records = append(records, maigo.NewRecord("visceral_fat", fmt.Sprint(*m.VisceralFat), m.Time.Time))
 		}
-		_, err := h.MaigoClient.AddRecords(contract.Id, records)
+		_, err := h.MaigoClient.AddRecords(contract.ID, records)
 		if err != nil {
 			sentry.CaptureException(err)
 			c.Logger().Error(err)

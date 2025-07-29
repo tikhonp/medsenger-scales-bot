@@ -7,18 +7,17 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/tikhonp/medsenger-scales-bot/config"
 )
 
 type apiKeyModel struct {
-	ApiKey string `json:"api_key" validate:"required"`
+	APIKey string `json:"api_key" validate:"required"`
 }
 
-func (k *apiKeyModel) isValid(cfg *config.Server) bool {
-	return cfg.MedsengerAgentKey == k.ApiKey
+func (k *apiKeyModel) isValid(cfg *Server) bool {
+	return cfg.MedsengerAgentKey == k.APIKey
 }
 
-func ApiKeyJSON(cfg *config.Server) echo.MiddlewareFunc {
+func APIKeyJSON(cfg *Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Workaround to read request body twice
@@ -45,7 +44,7 @@ func ApiKeyJSON(cfg *config.Server) echo.MiddlewareFunc {
 	}
 }
 
-func ApiKeyGetParam(cfg *config.Server) echo.MiddlewareFunc {
+func APIKeyGetParam(cfg *Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			apiKey := c.QueryParam("api_key")
