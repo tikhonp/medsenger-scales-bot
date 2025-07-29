@@ -6,25 +6,68 @@
 
 The __GO__ Medsenger bot for Xiaomi Mi Scales. It allows you to get your weight and body composition data from the scales to the Medsenger chat.
 
-## 🚀 Install
-
 # 📦 Development
 
-```bash
-pkl-gen-go pkl/config.pkl --base-path github.com/tikhonp/medsenger-scales-bot
+1. Install __docker__ and __make__
+
+2. Create configuration file on `.env`
+
+### Run Development
+
+```sh
+make
 ```
 
-Run dev server:
+or
 
-```bash
-make docker_dev
+```sh
+make dev
 ```
 
-Create db:
+or
 
-```bash
-docker exec -it 10 /bin/bash
-make up
+```sh
+make build-dev # preferred if config files were changed, so it rebuilds image
+```
+
+### HTML templating
+
+I use [templ](https://github.com/a-h/templ) as template engine. After changing `*.templ` files regenerate go code using:
+
+```sh
+make templ
+```
+
+> development docker container must be active
+
+### Enter server container shell
+
+There is shortcut for this:
+
+```sh
+make go-to-server-container
+```
+
+# Deploying
+
+To deploy you also need __docker__ and __make__. In project root run:
+
+```sh
+make prod
+```
+
+It will create prod containers and run it in detached mode.
+
+To stop run:
+
+```sh
+make fprod
+```
+
+To view logs in real time:
+
+```sh
+make logs-prod
 ```
 
 ## 💼 License
