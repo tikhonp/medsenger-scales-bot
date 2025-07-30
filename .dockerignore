@@ -25,3 +25,11 @@
 LICENSE
 README.md
 tailwind.config.js
+Makefile
+agents_scales_nginx.conf
+.air.toml
+.env.example
+.github/
+.gitlab-ci.yml
+compose.prod.yaml
+test.rest

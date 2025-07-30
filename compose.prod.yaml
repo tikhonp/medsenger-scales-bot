@@ -3,7 +3,11 @@ services:
     container_name: agents-scales-server
     image: docker.telepat.online/agents-scales-image:latest
     restart: unless-stopped
-    command: server
+    entrypoint: |
+      /bin/sh -c '
+        goose postgres "$(get_db_string)" -dir=migrations up
+        server
+      '
     network_mode: "host"
     logging:
       driver: "json-file"

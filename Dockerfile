@@ -11,14 +11,19 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 CMD ["air", "-c", ".air.toml"]
 
-FROM golang:${GOVERSION}-alpine AS prod
-RUN go install "github.com/pressly/goose/v3/cmd/goose@latest"
+FROM golang:${GOVERSION}-alpine AS build-prod
+RUN CGO_ENABLED=0 GOARCH=$TARGETARCH \
+    go install -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' github.com/pressly/goose/v3/cmd/goose@latest
 ARG TARGETARCH
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    GOARCH=$TARGETARCH go build -o /bin/server ./cmd/server
+    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/server ./cmd/server
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
+    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
+
+FROM alpine AS prod
+WORKDIR /src
+COPY --from=build-prod /bin/server /bin/get_db_string /go/bin/goose /bin/
 COPY . .
