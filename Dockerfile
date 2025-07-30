@@ -11,6 +11,7 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 CMD ["air", "-c", ".air.toml"]
 
+
 FROM golang:${GOVERSION}-alpine AS build-prod
 RUN CGO_ENABLED=0 GOARCH=$TARGETARCH \
     go install -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' github.com/pressly/goose/v3/cmd/goose@latest

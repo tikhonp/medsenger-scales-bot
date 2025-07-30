@@ -29,13 +29,13 @@ go-to-server-container:
 	docker exec -it --tty agents-scales-server /bin/sh
 
 db-status:
-	goose postgres "$(shell /bin/get_db_string)" -dir=migrations status
+	docker exec -it --tty agents-scales-server goose postgres "$(shell docker exec -it agents-scales-server /bin/get_db_string)" -dir=migrations status
 
 db-up:
-	goose postgres "$(shell /bin/get_db_string)" -dir=migrations up
+	docker exec -it --tty agents-scales-server goose postgres "$(shell docker exec -it agents-scales-server /bin/get_db_string)" -dir=migrations up
 
 db-reset:
-	goose postgres "$(shell /bin/get_db_string)" -dir=migrations reset
+	docker exec -it --tty agents-scales-server goose postgres "$(shell docker exec -it agents-scales-server /bin/get_db_string)" -dir=migrations reset
 
 templ:
 	docker exec -it --tty agents-scales-server templ generate
