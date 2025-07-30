@@ -3,7 +3,7 @@ SOURCE_COMMIT_SHA := $(shell git rev-parse HEAD)
 ENVS := SOURCE_COMMIT=${SOURCE_COMMIT_SHA} COMPOSE_BAKE=true
 
 
-.PHONY: run dev build-dev prod fprod logs-prod go-to-server-container templ db-status db-up db-reset
+.PHONY: run dev build-dev prod fprod logs-prod go-to-server-container templ db-status db-up db-reset build-prod-image
 
 run: dev
 
@@ -39,3 +39,6 @@ db-reset:
 
 templ:
 	docker exec -it --tty agents-scales-server templ generate
+
+build-prod-image:
+	${ENVS} docker build -t docker.telepat.online/agents-scales-image:latest --target prod .

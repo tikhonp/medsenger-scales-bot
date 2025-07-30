@@ -3,9 +3,6 @@ services:
     container_name: agents-scales-server
     image: docker.telepat.online/agents-scales-image:latest
     restart: unless-stopped
-    build:
-      context: .
-      target: prod
     command: server
     network_mode: "host"
     logging:

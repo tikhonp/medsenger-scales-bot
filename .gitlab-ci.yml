@@ -26,6 +26,5 @@ build:
   stage: build
   script:
     - touch .env
-    - docker compose build server
+    - make build-prod-image
     - docker push docker.telepat.online/agents-scales-image:latest
-
