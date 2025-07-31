@@ -1,5 +1,5 @@
 services:
-  server:
+  agents-scales:
     image: docker.telepat.online/agents-scales-image:latest
     container_name: agents-scales-server
     env_file:
