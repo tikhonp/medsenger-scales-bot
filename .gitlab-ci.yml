@@ -9,7 +9,6 @@ image: docker:28
 services:
   - name: docker:dind
     command: ["--host=tcp://0.0.0.0:2375"]
-    privileged: true
 
 variables:
   DOCKER_TLS_CERTDIR: ""
@@ -42,6 +41,7 @@ build:
     - $RUNNER_TAG
   <<: *before_build_template
   script: docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:$ARCH-latest --push .
+  privileged: true
 
 create-manifest:
   stage: manifest
