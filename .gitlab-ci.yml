@@ -4,27 +4,57 @@ workflow:
       when: always
     - when: never
 
-image: docker:24.0.7-dind
+image: docker:28
 
 services:
-  - docker:dind
+  - docker:28-dind
 
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
   REGISTRY: docker.telepat.online
-  COMPOSE_FILE: ./compose.prod.yaml
+  IMAGE_NAME: agents-scales-image
   SOURCE_COMMIT: $CI_COMMIT_SHA
 
 stages:
   - build
+  - manifest
 
-before_script:
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
+  # - apk add --no-cache docker-cli-buildx
+.before_build_template: &before_build_template
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
+    - docker buildx create --use || docker buildx use default
 
 build:
   stage: build
+  parallel:
+    matrix:
+      - ARCH: amd64
+        RUNNER_TAG: amd64
+      - ARCH: arm64v8
+        RUNNER_TAG: arm64v8
+  tags:
+    - $RUNNER_TAG
+  <<: *before_build_template
   script:
     - touch .env
-    - docker build -t docker.telepat.online/agents-scales-image:latest --target prod .
-    - docker push docker.telepat.online/agents-scales-image:latest
+    - docker buildx build --platform=linux/$ARCH --target prod \
+        -t $REGISTRY/$IMAGE_NAME:$ARCH-latest \
+        --load .
+    - docker push $REGISTRY/$IMAGE_NAME:$ARCH-latest
+
+create-manifest:
+  stage: manifest
+  image: docker:28
+  tags:
+    - amd64
+  <<: *before_build_template
+  script:
+    - docker manifest create $REGISTRY/$IMAGE_NAME:latest \
+        --amend $REGISTRY/$IMAGE_NAME:amd64-latest \
+        --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
+    - docker manifest push $REGISTRY/$IMAGE_NAME:latest
+  needs:
+    - job: build
+      artifacts: false
