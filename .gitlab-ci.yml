@@ -21,7 +21,9 @@ stages:
   - manifest
 
 .before_build_template: &before_build_template
-  before_script: echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
+    - docker buildx create --use || docker buildx use default
 
 build:
   stage: build
@@ -29,12 +31,14 @@ build:
     matrix:
       - ARCH: amd64
         RUNNER_TAG: amd64
+        DARCH: "linux/amd64"
       - ARCH: arm64v8
         RUNNER_TAG: arm64v8
+        DARCH: "linux/arm64/v8"
   tags:
     - $RUNNER_TAG
   <<: *before_build_template
-  script: docker build --target prod -t $REGISTRY/$IMAGE_NAME:latest --build-arg ARCH=$ARCH --push .
+  script: docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:$ARCH-latest --push .
 
 create-manifest:
   stage: manifest
@@ -42,9 +46,7 @@ create-manifest:
   tags:
     - amd64
   <<: *before_build_template
-  script:
-    - docker manifest create $REGISTRY/$IMAGE_NAME:latest --amend $REGISTRY/$IMAGE_NAME:amd64-latest --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
-    - docker manifest push $REGISTRY/$IMAGE_NAME:latest
+  script: docker buildx imagetools create --tag $REGISTRY/$IMAGE_NAME:latest $REGISTRY/$IMAGE_NAME:amd64-latest $REGISTRY/$IMAGE_NAME:arm64v8-latest
   needs:
     - job: build
       artifacts: false
