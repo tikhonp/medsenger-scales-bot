@@ -18,7 +18,7 @@ variables:
 
 stages:
   - build
-  - manifest
+  # - manifest
 
 .before_build_template: &before_build_template
   before_script:
@@ -38,17 +38,17 @@ build:
   tags:
     - $RUNNER_TAG
   <<: *before_build_template
-  script: docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:$ARCH-latest --push .
+  script: docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:latest --push .
 
-create-manifest:
-  stage: manifest
-  image: docker:28
-  tags:
-    - amd64
-  <<: *before_build_template
-  script:
-    - docker manifest create $REGISTRY/$IMAGE_NAME:latest --amend $REGISTRY/$IMAGE_NAME:amd64-latest --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
-    - docker manifest push $REGISTRY/$IMAGE_NAME:latest
-  needs:
-    - job: build
-      artifacts: false
+# create-manifest:
+#   stage: manifest
+#   image: docker:28
+#   tags:
+#     - amd64
+#   <<: *before_build_template
+#   script:
+#     - docker manifest create $REGISTRY/$IMAGE_NAME:latest --amend $REGISTRY/$IMAGE_NAME:amd64-latest --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
+#     - docker manifest push $REGISTRY/$IMAGE_NAME:latest
+#   needs:
+#     - job: build
+#       artifacts: false
