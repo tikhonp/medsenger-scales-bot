@@ -41,7 +41,6 @@ build:
     - $RUNNER_TAG
   <<: *before_build_template
   script: docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:$ARCH-latest --push .
-  privileged: true
 
 create-manifest:
   stage: manifest
