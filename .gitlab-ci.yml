@@ -7,9 +7,13 @@ workflow:
 image: docker:28
 
 services:
-  - docker:28-dind
+  - name: docker:dind
+    command: ["--host=tcp://0.0.0.0:2375"]
+    privileged: true
 
 variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
   REGISTRY: docker.telepat.online
   IMAGE_NAME: agents-scales-image
   SOURCE_COMMIT: $CI_COMMIT_SHA
