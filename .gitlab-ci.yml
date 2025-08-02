@@ -7,7 +7,7 @@ workflow:
 image: docker:28
 
 services:
-  docker:dind
+  - docker:dind
 
 variables:
   DOCKER_TLS_CERTDIR: ""
