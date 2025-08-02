@@ -32,16 +32,16 @@ build:
     matrix:
       - ARCH: amd64
         RUNNER_TAG: amd64
+        DARCH: "linux/amd64"
       - ARCH: arm64v8
         RUNNER_TAG: arm64v8
+        DARCH: "linux/arm64/v8"
   tags:
     - $RUNNER_TAG
   <<: *before_build_template
   script:
     - touch .env
-    - docker buildx build --platform=linux/$ARCH --target prod \
-        -t $REGISTRY/$IMAGE_NAME:$ARCH-latest \
-        --load .
+    - docker buildx build --platform=$DARCH --target prod -t $REGISTRY/$IMAGE_NAME:$ARCH-latest --load .
     - docker push $REGISTRY/$IMAGE_NAME:$ARCH-latest
 
 create-manifest:
