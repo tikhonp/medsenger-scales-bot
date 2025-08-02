@@ -20,11 +20,10 @@ stages:
   - build
   - manifest
 
-  # - apk add --no-cache docker-cli-buildx
 .before_build_template: &before_build_template
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
-    - docker buildx create --use --driver docker-container --bootstrap --driver-opt network=host 127.0.0.1 || docker buildx use default
+    - docker buildx create --use || docker buildx use default
 
 build:
   stage: build
@@ -48,9 +47,7 @@ create-manifest:
     - amd64
   <<: *before_build_template
   script:
-    - docker manifest create $REGISTRY/$IMAGE_NAME:latest \
-        --amend $REGISTRY/$IMAGE_NAME:amd64-latest \
-        --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
+    - docker manifest create $REGISTRY/$IMAGE_NAME:latest --amend $REGISTRY/$IMAGE_NAME:amd64-latest --amend $REGISTRY/$IMAGE_NAME:arm64v8-latest
     - docker manifest push $REGISTRY/$IMAGE_NAME:latest
   needs:
     - job: build
