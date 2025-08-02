@@ -7,8 +7,7 @@ workflow:
 image: docker:28
 
 services:
-  - name: docker:dind
-    command: ["--host=tcp://0.0.0.0:2375"]
+  name: docker:dind
 
 variables:
   DOCKER_TLS_CERTDIR: ""
@@ -25,7 +24,7 @@ stages:
 .before_build_template: &before_build_template
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $REGISTRY
-    - docker buildx create --use || docker buildx use default
+    - docker buildx create --use --driver docker-container --bootstrap --driver-opt network=host 127.0.0.1 || docker buildx use default
 
 build:
   stage: build
