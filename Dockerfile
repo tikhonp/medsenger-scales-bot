@@ -28,3 +28,9 @@ FROM alpine AS prod
 WORKDIR /src
 COPY --from=build-prod /bin/server /bin/get_db_string /go/bin/goose /bin/
 COPY . .
+EXPOSE 80
+ENV DEBUG=false
+ARG SOURCE_COMMIT
+ENV SOURCE_COMMIT=${SOURCE_COMMIT}
+ENV SERVER_PORT=80
+ENTRYPOINT ["/bin/sh", "-c", "goose postgres \"$(get_db_string)\" -dir=migrations up && server"]

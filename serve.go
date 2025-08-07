@@ -3,6 +3,7 @@ package medsengerscalesbot
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/TikhonP/maigo"
 	sentryecho "github.com/getsentry/sentry-go/echo"
@@ -38,16 +39,22 @@ func (s *Server) Listen() {
 	app := echo.New()
 	app.Debug = s.cfg.Debug
 	app.HideBanner = true
-	app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "[${time_rfc3339}] ${status} ${method} ${path} (${remote_ip}) ${latency_human}\n",
-		Output: app.Logger.Output(),
-	}))
-	app.Use(middleware.Recover())
-	if !s.cfg.Debug {
-		app.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
-		app.Logger.Printf("Sentry initialized")
-	}
 	app.Validator = util.NewDefaultValidator()
+
+	if app.Debug {
+		app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: "[${time_rfc3339}] ${status} ${method} ${path} (${remote_ip}) ${latency_human}\n",
+			Output: app.Logger.Output(),
+		}))
+	} else {
+		app.Use(sentryecho.New(sentryecho.Options{
+			Repanic:         true,
+			WaitForDelivery: false,
+			Timeout:         5 * time.Second,
+		}))
+		app.Use(middleware.Logger())
+	}
+	app.Use(middleware.Recover())
 
 	app.File("/.well-known/apple-app-site-association", "public/apple-app-site-association.json")
 	app.File("/.well-known/assetlinks.json", "public/assetlinks.json")
@@ -63,6 +70,6 @@ func (s *Server) Listen() {
 	app.GET("/get_height", s.getHeight.Get, util.APIKeyGetParam(s.cfg))
 	app.POST("/get_height", s.getHeight.Post, util.APIKeyGetParam(s.cfg))
 
-	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
+	addr := fmt.Sprintf(":%d", s.cfg.Port)
 	app.Logger.Fatal(app.Start(addr))
 }

@@ -28,9 +28,6 @@ type Database struct {
 }
 
 type Server struct {
-	// The hostname of this application.
-	Host string
-
 	// The port to listen on.
 	Port uint16
 
@@ -52,7 +49,6 @@ func LoadConfigFromEnv() *Config {
 	}
 	return &Config{
 		Server: &Server{
-			Host:              os.Getenv("SERVER_HOST"),
 			Port:              uint16(serverPort),
 			MedsengerAgentKey: os.Getenv("SCALES_KEY"),
 			Debug:             os.Getenv("DEBUG") == "true",
