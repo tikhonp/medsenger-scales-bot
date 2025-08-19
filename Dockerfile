@@ -12,17 +12,18 @@ RUN go mod download && go mod verify
 CMD ["air", "-c", ".air.toml"]
 
 
-FROM golang:${GOVERSION}-alpine AS build-prod
-RUN CGO_ENABLED=0 GOARCH=$TARGETARCH \
-    go install -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' github.com/pressly/goose/v3/cmd/goose@latest
+FROM --platform=$BUILDPLATFORM golang:${GOVERSION}-alpine AS build-prod
+ARG TARGETOS
 ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go install -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' github.com/pressly/goose/v3/cmd/goose@latest
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/server ./cmd/server
+    CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/server ./cmd/server
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/get_db_string ./cmd/get_db_string/
+    CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/get_db_string ./cmd/get_db_string/
 
 FROM alpine AS prod
 WORKDIR /src
