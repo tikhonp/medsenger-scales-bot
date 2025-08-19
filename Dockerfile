@@ -15,10 +15,9 @@ CMD ["air", "-c", ".air.toml"]
 FROM --platform=$BUILDPLATFORM golang:${GOVERSION}-alpine AS build-prod
 ARG TARGETOS
 ARG TARGETARCH
-ENV GOBIN=/bin
 RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,target=. \
     CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go mod download github.com/pressly/goose/v3@latest && \
     go build -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' -o /bin/goose github.com/pressly/goose/v3/cmd/goose
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod/ \
