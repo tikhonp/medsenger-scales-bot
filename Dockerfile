@@ -16,7 +16,6 @@ FROM --platform=$BUILDPLATFORM golang:${GOVERSION}-alpine AS build-prod
 ARG TARGETOS
 ARG TARGETARCH
 RUN --mount=type=cache,target=/go/pkg/mod/ \
-    --mount=type=bind,target=. \
     CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
     go build -o /bin/goose github.com/pressly/goose/v3/cmd/goose
 WORKDIR /src
