@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/TikhonP/maigo"
+	"github.com/tikhonp/maigo"
 	"github.com/getsentry/sentry-go"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/tikhonp/medsenger-scales-bot/db"
 	"github.com/tikhonp/medsenger-scales-bot/util"
 )
@@ -26,7 +26,7 @@ type NewRecordHandler struct {
 	MaigoClient *maigo.Client
 }
 
-func (h NewRecordHandler) Handle(c echo.Context) error {
+func (h NewRecordHandler) Handle(c *echo.Context) error {
 	m := new(newRecordModel)
 	if err := c.Bind(m); err != nil {
 		return err
@@ -61,7 +61,7 @@ func (h NewRecordHandler) Handle(c echo.Context) error {
 		_, err := h.MaigoClient.AddRecords(contract.ID, records)
 		if err != nil {
 			sentry.CaptureException(err)
-			c.Logger().Error(err)
+			c.Logger().Error(err.Error())
 		}
 	}()
 

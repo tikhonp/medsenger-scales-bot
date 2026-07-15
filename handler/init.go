@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/TikhonP/maigo"
+	"github.com/tikhonp/maigo"
 	"github.com/getsentry/sentry-go"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/tikhonp/medsenger-scales-bot/db"
 )
 
@@ -26,23 +26,23 @@ type InitHandler struct {
 	MaigoClient *maigo.Client
 }
 
-func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
+func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx *echo.Context) {
 	ci, err := h.MaigoClient.GetContractInfo(c.ID)
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
+		ctx.Logger().Error(err.Error())
 		return
 	}
 	age, err := strconv.ParseInt(ci.PatientAge, 10, 64)
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
+		ctx.Logger().Error(err.Error())
 		return
 	}
 	records, err := h.MaigoClient.GetRecords(c.ID, maigo.WithCategoryName("height"), maigo.Limit(1))
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
+		ctx.Logger().Error(err.Error())
 		return
 	}
 	var height float64
@@ -79,7 +79,7 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 	}
 	if err := c.Save(); err != nil {
 		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
+		ctx.Logger().Error(err.Error())
 		return
 	}
 	if c.PatientHeight.Valid {
@@ -93,12 +93,12 @@ func (h InitHandler) fetchContractDataOnInit(c db.Contract, ctx echo.Context) {
 		)
 		if err != nil {
 			sentry.CaptureException(err)
-			ctx.Logger().Error(err)
+			ctx.Logger().Error(err.Error())
 		}
 	}
 }
 
-func (h InitHandler) Handle(c echo.Context) error {
+func (h InitHandler) Handle(c *echo.Context) error {
 	m := new(initModel)
 	if err := c.Bind(m); err != nil {
 		return err

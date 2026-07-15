@@ -3,12 +3,13 @@ package medsengerscalesbot
 
 import (
 	"fmt"
+	"os"
 	"time"
 
-	"github.com/TikhonP/maigo"
+	"github.com/tikhonp/maigo"
 	sentryecho "github.com/getsentry/sentry-go/echo"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"github.com/tikhonp/medsenger-scales-bot/handler"
 	"github.com/tikhonp/medsenger-scales-bot/util"
 )
@@ -20,6 +21,7 @@ type Server struct {
 	status    handler.StatusHandler
 	remove    handler.RemoveHandler
 	settings  handler.SettingsHandler
+	scenario  handler.ScenarioCapabilitiesHandler
 	newRecord handler.NewRecordHandler
 	getApp    handler.GetAppHandler
 	getHeight handler.GetHeightHandler
@@ -37,39 +39,38 @@ func NewServer(cfg *util.Server) *Server {
 
 func (s *Server) Listen() {
 	app := echo.New()
-	app.Debug = s.cfg.Debug
-	app.HideBanner = true
 	app.Validator = util.NewDefaultValidator()
 
-	if app.Debug {
-		app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-			Format: "[${time_rfc3339}] ${status} ${method} ${path} (${remote_ip}) ${latency_human}\n",
-			Output: app.Logger.Output(),
-		}))
-	} else {
+	if !s.cfg.Debug {
 		app.Use(sentryecho.New(sentryecho.Options{
 			Repanic:         true,
 			WaitForDelivery: false,
 			Timeout:         5 * time.Second,
 		}))
-		app.Use(middleware.Logger())
 	}
+	app.Use(middleware.RequestLogger())
 	app.Use(middleware.Recover())
 
 	app.File("/.well-known/apple-app-site-association", "public/apple-app-site-association.json")
 	app.File("/.well-known/assetlinks.json", "public/assetlinks.json")
 	app.Static("/static", "public/static")
 	app.GET("/", s.root.Handle)
-	app.POST("/init", s.init.Handle, util.APIKeyJSON(s.cfg))
-	app.POST("/status", s.status.Handle, util.APIKeyJSON(s.cfg))
-	app.POST("/remove", s.remove.Handle, util.APIKeyJSON(s.cfg))
-	app.GET("/settings", s.settings.Handle, util.APIKeyGetParam(s.cfg))
+	app.POST("/init", s.init.Handle, util.AgentTokenJSON(s.cfg, "system"))
+	app.POST("/status", s.status.Handle, util.AgentTokenJSON(s.cfg, "system"))
+	app.POST("/remove", s.remove.Handle, util.AgentTokenJSON(s.cfg, "system"))
+	app.GET("/scenario-capabilities/v1", s.scenario.Capabilities, util.ScenarioAccess(s.cfg))
+	app.GET("/scenario-capabilities/v1/objects/:object_type", s.scenario.Objects, util.ScenarioAccess(s.cfg))
+	app.GET("/scenario-capabilities/v1/objects/:object_type/:object_id", s.scenario.Object, util.ScenarioAccess(s.cfg))
+	app.GET("/settings", s.settings.Handle, util.AgentTokenGetParam(s.cfg, "doctor", "patient", "system"))
 	app.POST("/new_record", s.newRecord.Handle)
 	app.GET("/app", s.getApp.Handle)
 
-	app.GET("/get_height", s.getHeight.Get, util.APIKeyGetParam(s.cfg))
-	app.POST("/get_height", s.getHeight.Post, util.APIKeyGetParam(s.cfg))
+	app.GET("/get_height", s.getHeight.Get, util.AgentTokenGetParam(s.cfg, "doctor", "patient", "system"))
+	app.POST("/get_height", s.getHeight.Post, util.AgentTokenGetParam(s.cfg, "doctor", "patient", "system"))
 
 	addr := fmt.Sprintf(":%d", s.cfg.Port)
-	app.Logger.Fatal(app.Start(addr))
+	if err := app.Start(addr); err != nil {
+		app.Logger.Error("server stopped", "error", err)
+		os.Exit(1)
+	}
 }

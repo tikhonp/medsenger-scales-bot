@@ -2,9 +2,9 @@ root = "."
 tmp_dir = "/tmp"
 
 [build]
-pre_cmd = ["templ generate", "go build -o /bin/get_db_string ./cmd/get_db_string/main.go"]
+pre_cmd = ["templ generate", "go build -o /bin/manage ./cmd/manage"]
 cmd = "go build -o /tmp/main ./cmd/server/main.go"
-bin = "/tmp/main"
+entrypoint = "/tmp/main"
 include_ext = ["go", "templ"]
 exclude_regex = ["_templ\\.go"]
-exclude_dir = ["pkl", "migrations", "public", "view/css"]
+exclude_dir = ["pkl", "db/migrations", "public", "view/css"]

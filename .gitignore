@@ -25,3 +25,5 @@ test.rest
 pkl_cache/
 
 .env
+
+CLAUDE.md

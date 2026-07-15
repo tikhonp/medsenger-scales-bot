@@ -3,13 +3,13 @@ package handler
 import (
 	"fmt"
 
-	"github.com/TikhonP/maigo"
+	"github.com/tikhonp/maigo"
 	"github.com/getsentry/sentry-go"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/tikhonp/medsenger-scales-bot/db"
 )
 
-func sendInitMessage(c db.Contract, maigoClient *maigo.Client, ctx echo.Context) {
+func sendInitMessage(c db.Contract, maigoClient *maigo.Client, ctx *echo.Context) {
 	link := fmt.Sprintf(
 		"https://scales.ai.medsenger.ru/app?agent_token=%s&contract_id=%d&type=connect&user_sex=%s&user_age=%d&user_height=%v",
 		c.AgentToken.String, c.ID, c.PatientSex.String, c.PatientAge.Int64, c.PatientHeight.Float64,
@@ -19,12 +19,12 @@ func sendInitMessage(c db.Contract, maigoClient *maigo.Client, ctx echo.Context)
 		"Если у вас есть весы Xiaomi Mi body composition scale, данные с них могут "+
 			"автоматически поступать врачу. Для этого Вам нужно скачать приложение "+
 			"<strong>Medsenger Scales</strong>, а затем нажать на кнопку \"Подключить устройство\" ниже.",
-		maigo.WithAction("Подключить устройство", link, maigo.AppUrl),
+		maigo.WithAction("Подключить устройство", link, maigo.AppURL),
 		maigo.OnlyPatient(),
 	)
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.Logger().Error(err)
+		ctx.Logger().Error(err.Error())
 		return
 	}
 }
